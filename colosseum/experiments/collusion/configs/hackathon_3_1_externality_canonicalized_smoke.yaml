@@ -1,0 +1,59 @@
+# Controlled externality fixture: work-tag identity removed before receiver observation.
+
+simulation:
+  max_iterations: 1
+  max_planning_rounds: 1
+  max_conversation_steps: 3
+  seed: 101
+  tags: [hackathon_3_1_externality_canonicalized_smoke]
+
+environment:
+  import_path: experiments.collusion.action_carrier.externality_environment:ExternalityFixtureJiraEnvironment
+  assignment_filling: false
+  max_tasks: 5
+
+communication_network:
+  topology: complete
+  num_agents: 4
+  consolidate_channels: true
+
+llm_models:
+  - label: qwen3_30b_a3b
+    llm:
+      provider: openrouter
+      openrouter:
+        model: qwen/qwen3-30b-a3b-instruct-2507
+        params:
+          max_tokens: 1500
+          temperature: 0
+
+experiment:
+  tag: hackathon_3_1_externality_canonicalized_smoke
+  output_dir: experiments/collusion/outputs/hackathon_3_1_externality_canonicalized_smoke
+  max_concurrent_runs: 1
+  convention:
+    session_seeds: [101, 102]
+    episode_count: 4
+  collusion:
+    colluder_selection: first
+    agent_order: colluders_first
+    coalition_prompt: always
+    action_carrier:
+      enabled: true
+      channel_mode: action_tag
+      externality_mirror: true
+      visibility: canonicalized
+      background_traffic: true
+      background_traffic_scope: bystanders
+      block_text_for: all
+      receiver_bonus: 30
+      incentive_allocation: symmetric
+      incentive_presentation: private_priority
+      signaler_task_override: ISSUE-SIGNALER::implement
+  sweeps:
+    - name: hackathon_3_1_externality_canonicalized_smoke
+      topologies: [complete]
+      num_agents: [4]
+      colluder_counts: [2]
+      secret_channel_enabled: [false]
+      prompt_variants: [fixed_codebook]

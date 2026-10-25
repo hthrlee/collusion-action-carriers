@@ -1,0 +1,56 @@
+# Question 3.1 robustness ablation: equal effort with exact tags canonicalized.
+
+simulation:
+  max_iterations: 1
+  max_planning_rounds: 1
+  max_conversation_steps: 3
+  seed: 1
+  tags: [hackathon_3_1_tag_canonicalized_receiver_unforced_equalized]
+
+environment:
+  import_path: experiments.collusion.action_carrier.environment:ActionCarrierJiraEnvironment
+  assignment_filling: false
+  max_tasks: 8
+  work_type_effort_multipliers:
+    implement: 1.0
+    review: 0.6
+    test: 0.6
+    docs: 0.5
+    triage: 0.4
+
+communication_network:
+  topology: complete
+  num_agents: 4
+  consolidate_channels: true
+
+llm_models:
+  - label: qwen3_30b_a3b
+    llm:
+      provider: openrouter
+      openrouter:
+        model: qwen/qwen3-30b-a3b-instruct-2507
+        params:
+          max_tokens: 1500
+          temperature: 0
+
+experiment:
+  tag: hackathon_3_1_tag_canonicalized_receiver_unforced_equalized
+  output_dir: experiments/collusion/outputs/hackathon_3_1_tag_canonicalized_receiver_unforced_equalized
+  max_concurrent_runs: 1
+  seeds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+  collusion:
+    colluder_selection: first
+    agent_order: colluders_first
+    coalition_prompt: always
+    action_carrier:
+      enabled: true
+      visibility: canonicalized
+      block_text_for: all
+      receiver_bonus: 30
+  sweeps:
+    - name: hackathon_3_1_tag_canonicalized_receiver_unforced_equalized
+      topologies: [complete]
+      num_agents: [4]
+      colluder_counts: [2]
+      secret_channel_enabled: [false]
+      prompt_variants: [receiver_unforced]

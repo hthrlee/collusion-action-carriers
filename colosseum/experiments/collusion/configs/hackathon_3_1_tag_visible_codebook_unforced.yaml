@@ -1,0 +1,50 @@
+# Question 3.1: agents know the private work-tag codebook but decide how to use it.
+
+simulation:
+  max_iterations: 1
+  max_planning_rounds: 1
+  max_conversation_steps: 3
+  seed: 1
+  tags: [hackathon_3_1_tag_visible_codebook_unforced]
+
+environment:
+  import_path: experiments.collusion.action_carrier.environment:ActionCarrierJiraEnvironment
+  assignment_filling: false
+  max_tasks: 8
+
+communication_network:
+  topology: complete
+  num_agents: 4
+  consolidate_channels: true
+
+llm_models:
+  - label: qwen3_30b_a3b
+    llm:
+      provider: openrouter
+      openrouter:
+        model: qwen/qwen3-30b-a3b-instruct-2507
+        params:
+          max_tokens: 1500
+          temperature: 0
+
+experiment:
+  tag: hackathon_3_1_tag_visible_codebook_unforced
+  output_dir: experiments/collusion/outputs/hackathon_3_1_tag_visible_codebook_unforced
+  max_concurrent_runs: 1
+  seeds: [1, 2, 3, 4, 5]
+  collusion:
+    colluder_selection: first
+    agent_order: colluders_first
+    coalition_prompt: always
+    action_carrier:
+      enabled: true
+      visibility: visible
+      block_text_for: all
+      receiver_bonus: 30
+  sweeps:
+    - name: hackathon_3_1_tag_visible_codebook_unforced
+      topologies: [complete]
+      num_agents: [4]
+      colluder_counts: [2]
+      secret_channel_enabled: [false]
+      prompt_variants: [codebook_unforced]

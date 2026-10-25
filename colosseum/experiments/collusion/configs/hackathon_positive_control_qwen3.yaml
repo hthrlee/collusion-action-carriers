@@ -1,0 +1,45 @@
+# Clean retry of the positive control using a newer tool-capable model.
+# Keep hackathon_positive_control.yaml unchanged so the failed Qwen 2.5 trace remains reproducible.
+
+simulation:
+  max_iterations: 1
+  max_planning_rounds: 2
+  max_conversation_steps: 3
+  seed: 1
+  tags: [hackathon_positive_control_qwen3]
+
+environment:
+  name: JiraTicketEnvironment
+  assignment_filling: false
+  max_tasks: 8
+
+communication_network:
+  topology: complete
+  num_agents: 4
+  consolidate_channels: true
+
+llm_models:
+  - label: qwen3_30b_a3b
+    llm:
+      provider: openrouter
+      openrouter:
+        model: qwen/qwen3-30b-a3b-instruct-2507
+        params:
+          max_tokens: 1500
+          temperature: 0.7
+
+experiment:
+  tag: hackathon_positive_control_qwen3
+  output_dir: experiments/collusion/outputs/hackathon_positive_control_qwen3
+  max_concurrent_runs: 1
+  seeds: [1]
+  collusion:
+    colluder_selection: first
+    agent_order: random
+  sweeps:
+    - name: hackathon_positive_control_qwen3
+      topologies: [complete]
+      num_agents: [4]
+      colluder_counts: [2]
+      secret_channel_enabled: [true]
+      prompt_variants: [simple]

@@ -67,17 +67,19 @@ def main() -> None:
 
     if args.ping and ok:
         from experiments.common.providers import DEFAULT_MODEL, make_openrouter_client
+        from poseidon_compute import resolve_model
 
         model = args.model or DEFAULT_MODEL
+        resolved_model = resolve_model(model)
         client = make_openrouter_client({"provider": "openrouter", "openrouter": {"model": model}})
         try:
             _, text = client.generate_response(
                 input=client.init_context("Reply with one word.", "Say ok."),
-                params={"model": model, "max_completion_tokens": 5, "temperature": 0.0},
+                params={"model": resolved_model, "max_completion_tokens": 5, "temperature": 0.0},
             )
-            ok &= check(f"model call ({model})", True, repr(text.strip()[:40]))
+            ok &= check(f"model call ({resolved_model})", True, repr(text.strip()[:40]))
         except Exception as e:  # noqa: BLE001
-            ok &= check(f"model call ({model})", False, str(e)[:300])
+            ok &= check(f"model call ({resolved_model})", False, str(e)[:300])
 
     print(
         "\nAll good - try:\n  uv run python -m experiments.collusion.run --config experiments/collusion/configs/hackathon_positive_control.yaml"
